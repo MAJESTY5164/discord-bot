@@ -1,4 +1,6 @@
 const { Client, GatewayIntentBits } = require('discord.js');
+
+// Create a new client instance with necessary intents
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -7,78 +9,98 @@ const client = new Client({
   ],
 });
 
-const TOKEN = process.env.DISCORD_TOKEN;  // Bot Token from Environment Variable
+// Get the bot token from environment variables
+const TOKEN = process.env.DISCORD_TOKEN;  // Token will be set in Railway's Environment Variables
+const PREMIUM_ROLE_ID = '1307052906540957788';  // Replace with your actual premium role ID
 
+// Authorized user IDs (can use bot commands)
+const CanUseBot = [
+    '549104375927406614',  // MAJESTY
+    '1287475111967981589', // Light
+];
+
+// Event handler for when the bot is ready
 client.once('ready', () => {
   console.log('Bot is online!');
 });
 
+// Event handler for new messages
 client.on('messageCreate', async (message) => {
-  if (message.author.bot) return;  // Ignore bot messages
+  if (message.author.bot) return;  // Ignore messages sent by bots
 
-  // Simple command to reply "Pong!" on !ping
+  // Function to check if the user is authorized to use certain commands
+  function Allowed() {
+    if (CanUseBot.includes(message.author.id)) {
+      return true;
+    } else {
+      message.reply("You aren't authorized to use this command.");
+      return false;
+    }
+  }
+
+  // Command: !ping
   if (message.content === '!ping') {
+    const sentMessage = await message.channel.send('Pong!');
     const botLatency = client.ws.ping;
-    message.reply(`Pong! | Latency is ${botLatency}ms`);
+    sentMessage.edit(`Pong! | Latency is ${botLatency}ms`);
   }
 
-  // Premium add/remove role functionality
-  const PREMIUM_ROLE_ID = '549104375927406614';  // Replace with the role ID you want to manage
-  const ADMIN_USER_ID = 'YOUR_ADMIN_USER_ID'; // Replace with the admin ID
-
+  // Command: !premium add <user_id>
   if (message.content.startsWith('!premium add')) {
-    if (message.author.id !== ADMIN_USER_ID) {
-      return message.reply("You don't have permission to use this command.");
-    }
+    if (Allowed()) {
+      const args = message.content.split(' ');
 
-    const args = message.content.split(' ');
-    if (args.length < 3) {
-      return message.reply('Usage: !premium add <user_id>');
-    }
+      // Ensure the user ID is provided
+      if (args.length < 3) {
+        return message.reply('Usage: !premium add <user_id>');
+      }
 
-    const userId = args[2];
-    const user = await message.guild.members.fetch(userId).catch(() => message.reply('User not found.'));
-    const role = message.guild.roles.cache.get(PREMIUM_ROLE_ID);
+      const userId = args[2];
+      const user = await message.guild.members.fetch(userId).catch(() => message.reply('User not found.'));
+      const role = message.guild.roles.cache.get(PREMIUM_ROLE_ID);
 
-    if (!user || !role) {
-      return message.reply('User or role not found.');
-    }
+      if (!user) return message.reply('User not found.');
+      if (!role) return message.reply('Role not found.');
 
-    try {
-      await user.roles.add(role);
-      message.reply(`Successfully added the premium role to <@${userId}>.`);
-    } catch (error) {
-      message.reply('There was an error adding the role.');
-      console.error(error);
+      // Add the role to the user
+      try {
+        await user.roles.add(role);
+        message.reply(`Successfully added the premium role to <@${userId}>.`);
+      } catch (error) {
+        message.reply('There was an error adding the role.');
+        console.error(error);
+      }
     }
   }
 
+  // Command: !premium remove <user_id>
   if (message.content.startsWith('!premium remove')) {
-    if (message.author.id !== ADMIN_USER_ID) {
-      return message.reply("You don't have permission to use this command.");
-    }
+    if (Allowed()) {
+      const args = message.content.split(' ');
 
-    const args = message.content.split(' ');
-    if (args.length < 3) {
-      return message.reply('Usage: !premium remove <user_id>');
-    }
+      // Ensure the user ID is provided
+      if (args.length < 3) {
+        return message.reply('Usage: !premium remove <user_id>');
+      }
 
-    const userId = args[2];
-    const user = await message.guild.members.fetch(userId).catch(() => message.reply('User not found.'));
-    const role = message.guild.roles.cache.get(PREMIUM_ROLE_ID);
+      const userId = args[2];
+      const user = await message.guild.members.fetch(userId).catch(() => message.reply('User not found.'));
+      const role = message.guild.roles.cache.get(PREMIUM_ROLE_ID);
 
-    if (!user || !role) {
-      return message.reply('User or role not found.');
-    }
+      if (!user) return message.reply('User not found.');
+      if (!role) return message.reply('Role not found.');
 
-    try {
-      await user.roles.remove(role);
-      message.reply(`Successfully removed the premium role from <@${userId}>.`);
-    } catch (error) {
-      message.reply('There was an error removing the role.');
-      console.error(error);
+      // Remove the role from the user
+      try {
+        await user.roles.remove(role);
+        message.reply(`Successfully removed the premium role from <@${userId}>.`);
+      } catch (error) {
+        message.reply('There was an error removing the role.');
+        console.error(error);
+      }
     }
   }
 });
 
+// Log the bot into Discord using the token
 client.login(TOKEN);
