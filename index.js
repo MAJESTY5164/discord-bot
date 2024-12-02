@@ -95,7 +95,7 @@ const client = new Client({
   ],
 });
 
-const TOKEN = 'MTMwOTU3Nzc2MTg5OTI4MjQ5Mw.GIJMOH.Xh2zDHmZWgE0Bbj_uD_XQR_wfOC7nQf1leAXmo';  // Replace with your bot token
+const TOKEN = process.env.DISCORD_TOKEN;
 const PREMIUM_ROLE_ID = '1307052906540957788';
 var StatusLevel = ["Member", "Mod", "Admin", "Owner", "Developer"]
 var Auth = [
@@ -245,6 +245,5 @@ client.on('messageCreate', async message => {
   }
   
 });
-
 // Log the bot into Discord using the token
 client.login(TOKEN);
