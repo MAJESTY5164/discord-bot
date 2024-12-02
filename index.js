@@ -1,7 +1,7 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const fetch = require('node-fetch'); // Importing node-fetch for HTTP requests
 
-const GitToken = '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'; // Hardcoded GitHub Token for testing
+const GitToken = process.env.Git_Token; // Hardcoded GitHub Token for testing
 const OWNER = 'MAJESTY5164'; // GitHub username (owner)
 const REPO = 'rounc-keysystem'; // Repository name
 const FILE_PATH = 'id-hwid'; // Path to the file you want to modify
