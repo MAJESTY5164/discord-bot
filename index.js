@@ -243,6 +243,11 @@ client.on('messageCreate', async message => {
       message.reply('You don’t have premium access.');
     }
   }
+
+  // Command !Hwid
+if (message.content === '!Hwid') {
+  message.reply('Run the following script to obtain your Roblox HWID, loadstring(game:HttpGet("https://github.com/MAJESTY5164/CeleryHub/blob/main/HWID%20Check.lua')
+}
   
 });
 // Log the bot into Discord using the token
