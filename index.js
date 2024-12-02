@@ -246,7 +246,7 @@ client.on('messageCreate', async message => {
 
   // Command !Hwid
 if (message.content === '!Hwid') {
-  message.reply('Run the following script to obtain your Roblox HWID, loadstring(game:HttpGet("https://github.com/MAJESTY5164/CeleryHub/blob/main/HWID%20Check.lua")')
+  message.reply('Run the following script to obtain your Roblox HWID, loadstring(game:HttpGet("https://raw.githubusercontent.com/MAJESTY5164/CeleryHub/refs/heads/main/HWID%20Check.lua"))()') //loadstring(game:HttpGet("https://raw.githubusercontent.com/MAJESTY5164/CeleryHub/refs/heads/main/HWID%20Check.lua"))()
 }
   
 });
