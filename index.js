@@ -100,11 +100,12 @@ const PREMIUM_ROLE_ID = '1307052906540957788';
 var StatusLevel = ["Member", "Mod", "Admin", "Owner", "Developer"]
 var Auth = [
     '549104375927406614', 'Developer', // MAJESTY
-    '1287475111967981589', 'Admin' // Light
+    '1287475111967981589', 'Owner' // Light
 ]
 
 client.once('ready', () => {
   console.log('Bot is online!');
+  p = "!"
 });
 
 client.on('messageCreate', async message => {
@@ -134,13 +135,13 @@ client.on('messageCreate', async message => {
       return(StatusLevel.indexOf(userstatus(check)))
     }
 
-    if (message.content.startsWith('!auth')) {
+    if (message.content.startsWith(p + 'auth')) {
       const args = message.content.split(' ');
 
       message.reply("you have " + userstatus(args[1]) + " (" + userlevel(args[1]) + ") " + " perms")
       }
 
-    if (message.content === '!ping') {
+    if (message.content === p + 'ping') {
       // Send a "Pong!" message first
       const sentMessage = await message.channel.send('Pong!');
     
@@ -151,13 +152,13 @@ client.on('messageCreate', async message => {
         sentMessage.edit(`Pong! | Latency is ${botLatency}ms`);
   }
 
-  if (message.content.startsWith('!premium add')) {
+  if (message.content.startsWith(p + 'premium add')) {
     if (userlevel() >= 2) {
     const args = message.content.split(' ');
 
     // Ensure the user ID is provided
     if (args.length < 3) {
-      return message.reply('Usage: !premium add <user_id>');
+      return message.reply('Usage: ' + p + 'premium add <user_id>');
     }
 
     const userId = args[2];
@@ -180,13 +181,13 @@ client.on('messageCreate', async message => {
   }}
 
   // Command: !premium remove <user_id>
-  if (message.content.startsWith('!premium remove')) {
+  if (message.content.startsWith(p + 'premium remove')) {
     if (userlevel() >= 2) {
     const args = message.content.split(' ');
 
     // Ensure the user ID is provided
     if (args.length < 3) {
-      return message.reply('Usage: !premium remove <user_id>');
+      return message.reply('Usage: ' + p + 'premium remove <user_id>');
     }
 
     const userId = args[2];
@@ -209,7 +210,7 @@ client.on('messageCreate', async message => {
   }}
 
   // commadn: !kys
-  if (message.content === '!kys') {
+  if (message.content === p + 'kys') {
     if (userlevel() >= 4) {
       const emojiUrl = 'https://cdn.discordapp.com/emojis/618142863737487400.webp?size=96';
       const messageText = 'Shutting Down :(';
@@ -224,7 +225,7 @@ client.on('messageCreate', async message => {
   }
 
   // Command: !verify
-  if (message.content === '!verify') {
+  if (message.content === p + 'verify') {
   
     if (member.roles.cache.some(role => role.id === PREMIUM_ROLE_ID) || userlevel() >= 1) {
       message.reply('Please run this script in roblox. loadstring(game:HttpGet("https://pastebin.com/raw/pCXYqVDh"))()');
@@ -233,8 +234,23 @@ client.on('messageCreate', async message => {
     }
   }
 
+  if (message.content.includes('set rounk prefix')) {
+    const args = message.content.split(' ');
+  
+    if ((userlevel() >= 3)) {
+      if (args.length === 4) {
+      p = args[3]
+      message.reply('prefix is now ' + p);
+      }else {
+        message.reply('Invalid args');
+      } 
+    } else {
+      message.reply('You don’t have premium access.');
+    }
+  }
+
 // Command !Hwid
-if (message.content === '!Hub') {
+if (message.content === p + 'Hub') {
   message.reply('loadstring(game:HttpGet("https://pastebin.com/raw/6JDZB0YX"))()')
 }
 
