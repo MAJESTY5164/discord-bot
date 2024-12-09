@@ -215,8 +215,8 @@ client.on('messageCreate', async message => {
       const messageText = 'Shutting Down :(';
     
       message.reply({
-        content: messageText, // The text accompanying the emoji
-        files: [emojiUrl]     // Attach the emoji as an image
+        content: messageText,
+        files: [emojiUrl]
       })
     }else {
       message.reply("only MAJESTY can do this")
@@ -224,31 +224,20 @@ client.on('messageCreate', async message => {
   }
 
   // Command: !verify
-  if (message.content.startsWith('!verify')) {
-    const args = message.content.split(' ');
+  if (message.content === '!verify') {
   
     if (member.roles.cache.some(role => role.id === PREMIUM_ROLE_ID) || userlevel() >= 1) {
-      if (args.length < 2) {
-        return message.reply('Usage: !verify <HWID> (use !Hwid to find your Roblox HWID)');
-      }
-  
-      try {
-        message.reply('Checking and updating authorization...');
-        await updateFile(message.author.id, args[1]);
-      } catch (error) {
-        message.reply('An error has occurred.');
-        console.error(error);
-      }
+      message.reply('Please run this script in roblox. loadstring(game:HttpGet("https://pastebin.com/raw/pCXYqVDh"))()');
     } else {
       message.reply('You don’t have premium access.');
     }
   }
 
-  // Command !Hwid
-if (message.content === '!Hwid') {
-  message.reply('Run the following script to obtain your Roblox HWID, loadstring(game:HttpGet("https://raw.githubusercontent.com/MAJESTY5164/CeleryHub/refs/heads/main/HWID%20Check.lua"))()') //loadstring(game:HttpGet("https://raw.githubusercontent.com/MAJESTY5164/CeleryHub/refs/heads/main/HWID%20Check.lua"))()
+// Command !Hwid
+if (message.content === '!Hub') {
+  message.reply('loadstring(game:HttpGet("https://pastebin.com/raw/6JDZB0YX"))()')
 }
-  
+
 });
-// Log the bot into Discord using the token
+
 client.login(TOKEN);
