@@ -1,259 +1,283 @@
-const { Client, GatewayIntentBits } = require('discord.js');
-const fetch = require('node-fetch'); // Importing node-fetch for HTTP requests
+// Import the Discord.js selfbot library
+const { Client, ActivityType, Interaction } = require('discord.js-selfbot-v13');
 
-const GitToken = process.env.Git_Token; // Hardcoded GitHub Token for testing
-const OWNER = 'MAJESTY5164'; // GitHub username (owner)
-const REPO = 'rounc-keysystem'; // Repository name
-const FILE_PATH = 'id-hwid'; // Path to the file you want to modify
-const COMMIT_MESSAGE = 'Updated HWID for existing ID'; // Commit message
+    const fs = require('fs').promises;
 
-// GitHub API URL for accessing the file
-const apiUrl = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}`;
+    blpeople = []
+    vips = []
+    viproles = []
+    blroles = []
+    devs = []
+    limit = "Normal"
+    pfx = "sb!"
 
-async function updateFile(userID, hwid) {
-  try {
-    // Step 1: Fetch the current file content from GitHub
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${GitToken}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
+ownerID = '549104375927406614'
+
+devs.push(ownerID)
+
+// Create a new client instance
+const client = new Client();
+const si = require('systeminformation');
+
+
+// Event: Runs when the bot logs in
+client.on('ready', async () => {
+    console.log(`Logged in as ${client.user.tag}!`);
+    
+    client.user.setPresence({
+        activities: [{ name: "Bot Online [Prefix: " + pfx + "]", type: "WATCHING" }],
+        status: "dnd" // Other options: "idle", "dnd", "invisible"
     });
 
-    if (!response.ok) {
-      throw new Error(`Error fetching file (${response.status}): ${response.statusText}`);
+    try {
+        const user = await client.users.fetch('549104375927406614'); // Fetch the user by ID
+        await user.send('Bot Online prefix is ' + pfx); // Send the message to the user
+    } catch (error) {
+        console.error('Error sending DM:', error);
     }
-
-    // Step 2: Get the current file data (including content and sha)
-    const fileData = await response.json();
-    const { sha, content } = fileData; // SHA is required for updating the file
-
-    // Step 3: Decode the current file content from Base64
-    const decodedContent = Buffer.from(content, 'base64').toString('utf-8');
-
-    // Step 4: Update the HWID for the existing ID or append if not found
-    const lines = decodedContent.split('\n');
-    let idFound = false;
-
-    const updatedLines = lines.map(line => {
-      const [id, existingHwid] = line.trimStart().split(' | '); // Trim and split the line
-      if (id === userID) {
-        idFound = true;
-        return `${id} | ${hwid}`; // Replace HWID for the matched ID
-      }
-      return line; // Keep other lines unchanged
-    });
-
-    if (!idFound) {
-      // If the ID wasn't found, append it to the file
-      updatedLines.push(`${userID} | ${hwid}`);
-    }
-
-    // Step 5: Encode the updated content to Base64
-    const updatedContent = updatedLines.join('\n');
-    const encodedContent = Buffer.from(updatedContent, 'utf-8').toString('base64');
-
-    // Step 6: Create the payload to update the file
-    const updatePayload = {
-      message: COMMIT_MESSAGE,
-      content: encodedContent, // New content (encoded in Base64)
-      sha, // SHA of the existing file (to avoid conflicts)
-    };
-
-    // Step 7: Send the update request to GitHub
-    const updateResponse = await fetch(apiUrl, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${GitToken}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-      body: JSON.stringify(updatePayload),
-    });
-
-    if (!updateResponse.ok) {
-      throw new Error(`Error updating file (${updateResponse.status}): ${updateResponse.statusText}`);
-    }
-
-    const updateResult = await updateResponse.json();
-    console.log(
-      idFound
-        ? `HWID for ID ${userID} updated successfully.`
-        : `ID ${userID} added successfully with new HWID.`
-    );
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
-
-
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-  ],
 });
 
-const TOKEN = process.env.DISCORD_TOKEN;
-const PREMIUM_ROLE_ID = '1307052906540957788';
-var StatusLevel = ["Member", "Mod", "Admin", "Owner", "Developer"]
-var Auth = [
-    '549104375927406614', 'Developer', // MAJESTY
-    '1287475111967981589', 'Owner' // Light
-]
+atschool = false
 
-client.once('ready', () => {
-  console.log('Bot is online!');
-  p = "!"
-});
+// Event: Respond to messages
+client.on('messageCreate', async (message) => {
 
-client.on('messageCreate', async message => {
-    if (message.author.bot) {
-      if (message.content === "Shutting Down :(") {
-        process.exit();
-      }else {
-        return;  // Ignore messages sent by bots
-      }
-    }
-
-    const member = message.guild.members.cache.get(message.author.id);
-
-    function userstatus(check) {
-      if (check === undefined) {
-        check = message.author.id
-      }
-        if (!Auth.includes(check)) {
-            perms = "Member"
-        }else { // if (Auth.indexOf(message.author.id)) {
-            perms = (Auth[Auth.indexOf(check) + 1])
+    if (message.mentions.users.has('549104375927406614')) {
+    if (atschool === true) {
+        if (message.author.id !== '1337436221919461407') {
+        message.reply('Hello! MAJESTY is currently at school any responses my be delayed.')
         }
-        return(perms)
     }
-
-    function userlevel(check) {
-      return(StatusLevel.indexOf(userstatus(check)))
     }
-
-    if (message.content.startsWith(p + 'auth')) {
-      const args = message.content.split(' ');
-
-      message.reply("you have " + userstatus(args[1]) + " (" + userlevel(args[1]) + ") " + " perms")
-      }
-
-    if (message.content === p + 'ping') {
-      // Send a "Pong!" message first
-      const sentMessage = await message.channel.send('Pong!');
+    if (message.author.bot) return;
     
-        // Get the bot's latency and calculate the delay
-        const botLatency = client.ws.ping;
-    
-        // Modify the "Pong!" message to include the bot's latency
-        sentMessage.edit(`Pong! | Latency is ${botLatency}ms`);
-  }
-
-  if (message.content.startsWith(p + 'premium add')) {
-    if (userlevel() >= 2) {
-    const args = message.content.split(' ');
-
-    // Ensure the user ID is provided
-    if (args.length < 3) {
-      return message.reply('Usage: ' + p + 'premium add <user_id>');
+    if (message.guild) {
+        if (blroles.some(role => message.guild.members.cache.get(message.author.id).roles.cache.map(role => role.id).includes(role))) {
+            return
+        }
     }
+    if (blpeople.includes(message.author.id)) return
 
-    const userId = args[2];
-    const user = await message.guild.members.fetch(userId).catch(err => message.reply('User not found.'));
-    const role = message.guild.roles.cache.get(PREMIUM_ROLE_ID);
-
-    if (!user) return message.reply('User not found.');
-    if (!role) return message.reply('Role not found.');
-
-    // Add the role to the user
-    try {
-      await user.roles.add(role);
-      message.reply(`Successfully added the premium role to <@${userId}>.`);
-    } catch (error) {
-      message.reply('There was an error adding the role.');
-      console.error(error);
-    }
-  }else {
-    message.reply("you are not authorized to use this command.")
-  }}
-
-  // Command: !premium remove <user_id>
-  if (message.content.startsWith(p + 'premium remove')) {
-    if (userlevel() >= 2) {
-    const args = message.content.split(' ');
-
-    // Ensure the user ID is provided
-    if (args.length < 3) {
-      return message.reply('Usage: ' + p + 'premium remove <user_id>');
-    }
-
-    const userId = args[2];
-    const user = await message.guild.members.fetch(userId).catch(err => message.reply('User not found.'));
-    const role = message.guild.roles.cache.get(PREMIUM_ROLE_ID);
-
-    if (!user) return message.reply('User not found.');
-    if (!role) return message.reply('Role not found.');
-
-    // Remove the role from the user
-    try {
-      await user.roles.remove(role);
-      message.reply(`Successfully removed the premium role from <@${userId}>.`);
-    } catch (error) {
-      message.reply('There was an error removing the role.');
-      console.error(error);
-    }
-  }else {
-    message.reply("you are not authorized to use this command.")
-  }}
-
-  // commadn: !kys
-  if (message.content === p + 'kys') {
-    if (userlevel() >= 4) {
-      const emojiUrl = 'https://cdn.discordapp.com/emojis/618142863737487400.webp?size=96';
-      const messageText = 'Shutting Down :(';
-    
-      message.reply({
-        content: messageText,
-        files: [emojiUrl]
-      })
+    if (message.guild) {
+        if (viproles.some(role => message.guild.members.cache.get(message.author.id).roles.cache.map(role => role.id).includes(role))) {
+            vip = true
+        }else {
+            vip = vips.includes(message.author.id)
+        }
     }else {
-      message.reply("only MAJESTY can do this")
+        vip = vips.includes(message.author.id)
     }
-  }
 
-  // Command: !verify
-  if (message.content === p + 'verify') {
-  
-    if (member.roles.cache.some(role => role.id === PREMIUM_ROLE_ID) || userlevel() >= 1) {
-      message.reply('Please run this script in roblox. loadstring(game:HttpGet("https://pastebin.com/raw/pCXYqVDh"))()');
-    } else {
-      message.reply('You don’t have premium access.');
+    if (limit === "Dev") {
+        if (devs.includes(message.author.id)) {
+            
+        }else {
+            return
+        }
+    }else if (limit === "Open") {
+        vip = true
+    }else if (limit === "Limted") {
+        if (vip === true) {
+
+        }else {
+            return
+        }
     }
-  }
 
-  if (message.content.includes('set rounk prefix')) {
-    const args = message.content.split(' ');
-  
-    if ((userlevel() >= 3)) {
-      if (args.length === 4) {
-      p = args[3]
-      message.reply('prefix is now ' + p);
-      }else {
-        message.reply('Invalid args');
-      } 
-    } else {
-      message.reply('You don’t have premium access.');
+    SMPLtxt = "n/a"
+
+    if (message.content.startsWith(pfx + 'storage')) {
+        if (devs.includes(message.author.id)) {
+        async function simpl(a, v) {
+        if (a.length === 1) {
+            x = `['` + a[0] + `']`
+        }else if (a.length === 0) {
+            x = '[]'
+        }else {
+        x = `['` + a[0] + `',`
+
+        for (let i = 1; i < a.length; i++) {
+          if (i === a.length - 1) {
+            x = x + `'` + a[i] + `']`
+          }else {
+            x = x + `'` + a[i] + `',`
+        }}}
+        if (SMPLtxt === "n/a") {
+            SMPLtxt = v + ' = ' + x
+        }else {
+        SMPLtxt = SMPLtxt + '\n' + v + ' = ' + x
+        }
+        return x
     }
-  }
+        await simpl(blpeople, "blpeople")
+        await simpl(vips, "vips")
+        await simpl(viproles, "viproles")
+        await simpl(blroles, "blroles")
+        await simpl(devs, "devs")
+        message.reply('```' + SMPLtxt + '```')
+    }}
 
-// Command !Hwid
-if (message.content === p + 'Hub') {
-  message.reply('loadstring(game:HttpGet("https://pastebin.com/raw/6JDZB0YX"))()')
+    if (message.content.startsWith(pfx + 'role')) {
+        const args = message.content.split(" ");
+        if (args.length === 4) {
+            if (args[1] === "+") {
+                if (args[2] === "vip") {
+                    if (viproles.includes(args[3])) {
+                        message.reply(args[3] + " is already a vip role.");
+                    }else {
+                    viproles.push(args[3])
+                    console.log(viproles)
+                    message.reply(args[3] + " is now a vip role.");
+                    }
+                }else if (args[2] === "blacklist") {
+                    if (blroles.includes(args[3])) {
+                        message.reply(args[3] + " is already a blacklisted role.");
+                    }else {
+                    blroles.push(args[3])
+                    message.reply(args[3] + " is now a blacklisted role.");
+                    }
+                }else { // not blacklist or vip
+                    message.reply("options are blacklist or vip")
+                }
+            }else if (args[1] === "-") {
+                if (args[2] === "vip") {
+                    if (viproles.includes(args[3])) {
+                        message.reply(args[3] + " is nolonger a vip role.");
+                        viproles.splice(viproles.indexOf(args[3]), 1)
+                    }else {
+                    message.reply(args[3] + " isn't a vip role.");
+                    }
+                }else if (args[2] === "blacklist") {
+                    if (blroles.includes(args[3])) {
+                        message.reply(args[3] + " is nolonger a blacklisted role.");
+                        blroles.splice(blroles.indexOf(args[3]), 1)
+                    }else {
+                    message.reply(args[3] + " isn't a blacklisted role.");
+                    }
+                }else { // not blacklist or vip
+                    message.reply("options are blacklist or vip")
+                }
+            }else { // not + or -
+                message.reply("didnt specify + or -")
+            }
+        }else { // args !== 4
+            message.reply('more than 3 arguments were given')
+        }
+    }
+
+    if (message.content.startsWith(pfx + 'limit')) {
+        if (devs.includes(message.author.id)) {
+        const args = message.content.split(" ");
+        if (args.length === 2) {
+            opt = args[1]
+            if (opt === "Normal") {
+                message.reply('Anyone can use commands');
+                limit = "Normal"
+            }else if (opt === "Open") {
+                message.reply('Vip commands are available to everyone');
+                limit - "Open"
+            }else if (opt === "Limited") {
+                message.reply('Only Vips & Devs can use commands');
+                limit = "Limited"
+            }else if (opt === "Dev") {
+                message.reply('Only Devs can use commands');
+                limit = "Dev"
+            }else {
+                message.reply('Invalid Arguments [Normal, Open, Limited, & Dev]');
+            }
+        }else
+        message.reply('Invalid Arguments [Normal, Open, Limited, & Dev]');
+    }else {
+        message.reply('You dont have permission to use this command')
+     }
 }
 
+    if (message.content === pfx + 'ping') {
+        message.reply('Pong!');
+    }
+
+    if (message.content.startsWith(pfx + 'pfp')) {
+        if (vip) {
+        const args = message.content.split(" ");
+        console.log(message.mentions.users)
+        if (message.mentions.users.size === 1) {
+            console.log('Mention given');
+            console.log(message.mentions.users.first().id)
+            id = message.mentions.users.first().id
+        }else if (args.length === 2) {
+            console.log(args[1])
+            id = args[1]
+        }else {
+            console.log('invalid args')
+            message.reply('invalid arguments')
+            return
+        }
+        try {
+            const user = await client.users.fetch(id);
+            const avatarUrl = user.displayAvatarURL({ dynamic: true, size: 1024 });
+
+            await message.reply(`Here is their profile picture: ${avatarUrl}`);
+        } catch (error) {
+            console.error("Error fetching user:", error);
+            await message.reply("Could not fetch the user's profile picture.");
+        }
+    }else {
+        message.reply('You dont have permission to use this command')
+    }
+}
+
+    //if (message.author.id !== '549104375927406614') return;
+
+    if (message.content.startsWith(pfx + 'pfx')) {
+        if (devs.includes(message.author.id)) {
+        const args = message.content.split(" ");
+        if (args.length === 2) {
+        pfx = args[1]
+        message.reply('New prefix assigned [' + pfx + "]")
+        client.user.setPresence({
+            activities: [{ name: "Bot Online [Prefix: " + pfx + "]", type: "WATCHING" }],
+            status: "dnd" // Other options: "idle", "dnd", "invisible"
+        });
+    }else {
+        message.reply('invalid arguments')
+    }
+    }else {
+        message.reply('You dont have permission to use this command')
+    }
+    } 
+    
+    if (message.content === pfx + 'School') {
+        if (devs.includes(message.author.id)) {
+    if (atschool === true) {
+        message.reply('Afk School responses are now disabled');
+        atschool = false
+    }else {
+        message.reply('Afk School responses are now enabled');
+        atschool = true
+    }
+    }else {
+        message.reply('You dont have permission to use this command')
+    }
+    }
+    // Example command: !ping
+    if (message.content === pfx + 'shutdown') {
+        if (message.author.id === ownerID) {
+        client.user.setPresence({
+            activities: [{ name: "Bot Offline", type: "WATCHING" }],
+            status: "dnd" // Other options: "idle", "dnd", "invisible"
+        });
+        message.reply({
+            content: 'Shutting Down',
+            files: ['https://cdn.discordapp.com/emojis/806719693913980948.webp?size=96'] // Replace with your image URL
+        });
+        setTimeout(function() {
+            process.exit()
+        }, 10000); // Wait for 2000 milliseconds (2 seconds)
+    }else {
+        message.reply('You dont have permission to use this command')
+    }
+}
 });
 
-client.login(TOKEN);
+// Log in to your account
+client.login(process.env.DISCORD_TOKEN); // Replace with your account token
