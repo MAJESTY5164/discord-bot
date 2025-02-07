@@ -17,7 +17,6 @@ devs.push(ownerID)
 
 // Create a new client instance
 const client = new Client();
-const si = require('systeminformation');
 
 
 // Event: Runs when the bot logs in
